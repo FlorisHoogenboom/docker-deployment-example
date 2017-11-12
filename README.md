@@ -1,0 +1,2 @@
+# [WIP] docker-deployment-example
+WORK IN PROGRESS... A repository that shows how Docker can be used in conjunction with TravisCI to automate testing, fitting and depoyment of a machine learning model.
