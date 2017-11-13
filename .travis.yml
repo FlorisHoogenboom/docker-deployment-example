@@ -11,4 +11,4 @@ branches:
 services:
   - docker
 script:
-  - python setup.py tests
+  - python setup.py test
