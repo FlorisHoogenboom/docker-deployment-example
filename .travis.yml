@@ -10,5 +10,21 @@ branches:
   - master
 services:
   - docker
+install:
+  # First install package and it's dependencies
+  # relying on setuptools to handle this during testing
+  # is very inefficient
+  - pip install -e .
+  # Fetch the data needed for fitting
+  - mkdir data && curl https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/datasets/stackloss.csv >> data/stackloss.csv
 script:
+  # Run tests for this package to see whether
+  # changes did not break anything...
   - python setup.py test
+
+  # BUILD PHASE
+  # Make some folders needed to build
+  - mkdir build
+  # Run package as main, this should
+  # return a fitted model in ./build
+  - python -m docker_deployment_example
