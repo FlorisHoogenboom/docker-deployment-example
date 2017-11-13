@@ -29,6 +29,8 @@ script:
 deploy:
   provider: script
   script:
-    - echo "Starting deployment"
+    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+    - docker push "$DOCKER_USERNAME/docker-deployment-example:latest
   on:
     branch: master
+  skip_cleanup: true
