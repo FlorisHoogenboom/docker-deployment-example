@@ -1,13 +1,8 @@
 language: python
 python:
-  # We don't actually use the Travis Python, but this keeps it organized.
   - "3.6"
-  - "2.7"
 git:
   depth: 1
-branches:
-  only:
-  - master
 services:
   - docker
 install:
@@ -22,9 +17,18 @@ script:
   # changes did not break anything...
   - python setup.py test
 
-  # BUILD PHASE
+  # FIT MODEL PHASE
   # Make some folders needed to build
   - mkdir build
   # Run package as main, this should
   # return a fitted model in ./build
   - python -m docker_deployment_example
+
+  # Build docker container
+  - docker build . -t florishoogenboom/docker_deployment_example
+deploy:
+  provider: script
+  script:
+    - echo "Starting deployment"
+  on:
+    branch: master
