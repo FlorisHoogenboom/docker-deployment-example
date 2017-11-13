@@ -25,12 +25,9 @@ script:
   - python -m docker_deployment_example
 
   # Build docker container
-  - docker build . -t florishoogenboom/docker_deployment_example
-deploy:
-  provider: script
-  script:
-    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-    - docker push "$DOCKER_USERNAME/docker-deployment-example:latest
-  on:
-    branch: master
-  skip_cleanup: true
+  - docker build . -t florishoogenboom/docker_deployment_example:lastest
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
+    docker push florishoogenboom/docker_deployment_example:lastest;
+    fi
