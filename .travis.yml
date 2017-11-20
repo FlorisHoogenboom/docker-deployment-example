@@ -8,7 +8,7 @@ services:
 install:
   # First install package and it's dependencies
   # relying on setuptools to handle this during testing
-  # is very inefficient
+  # is very inefficient (since this will recompile from source)
   - pip install -e .
   # Fetch the data needed for fitting
   - mkdir data && curl https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/datasets/stackloss.csv >> data/stackloss.csv
@@ -16,18 +16,26 @@ script:
   # Run tests for this package to see whether
   # changes did not break anything...
   - python setup.py test
-
   # FIT MODEL PHASE
   # Make some folders needed to build
   - mkdir build
   # Run package as main, this should
   # return a fitted model in ./build
   - python -m docker_deployment_example
-
   # Build docker container
-  - docker build . -t florishoogenboom/docker_deployment_example:latest
+  - docker build . -t build_artifact
 after_success:
+  # Login to the Dockerhub registry
+  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
+  # If the commit on master is tagged, not only create a latest release
+  # but also include the tag as version.
+  - if [ -n "$TRAVIS_TAG" ]; then
+    echo "This repo was tagged, building tagged versions";
+    docker tag build_artifact $DOCKER_USERNAME/docker-deployment-example:$TRAVIS_TAG;
+    docker push $DOCKER_USERNAME/docker-deployment-example:$TRAVIS_TAG;
+    fi
+  # For commits to the master branch we only create a latest version.
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
-    docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
-    docker push florishoogenboom/docker_deployment_example:latest;
+    docker tag build_artifact $DOCKER_USERNAME/docker-deployment-example:latest;
+    docker push $DOCKER_USERNAME/docker-deployment-example:latest;
     fi
